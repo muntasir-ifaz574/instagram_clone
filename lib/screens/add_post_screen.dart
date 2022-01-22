@@ -87,7 +87,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
 
-    return _file == null && userProvider.getUser == null
+    return _file == null
         ? Center(
             child: IconButton(
               icon: const Icon(
@@ -96,71 +96,75 @@ class _AddPostScreenState extends State<AddPostScreen> {
               onPressed: () => _selectImage(context),
             ),
           )
-        : Scaffold(
-            appBar: AppBar(
-              backgroundColor: mobileBackgroundColor,
-              title: const Text(
-                'Post to',
-              ),
-              centerTitle: false,
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => postImage(
-                    userProvider.getUser!.uid,
-                    userProvider.getUser!.username,
-                    userProvider.getUser!.photoUrl,
+        : userProvider.getUser == null
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Scaffold(
+                appBar: AppBar(
+                  backgroundColor: mobileBackgroundColor,
+                  title: const Text(
+                    'Post to',
                   ),
-                  child: const Text(
-                    "Post",
-                    style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16.0),
-                  ),
-                )
-              ],
-            ),
-            body: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(
+                  centerTitle: false,
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => postImage(
+                        userProvider.getUser!.uid,
+                        userProvider.getUser!.username,
                         userProvider.getUser!.photoUrl,
                       ),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: TextField(
-                        controller: _descriptionController,
-                        decoration: const InputDecoration(
-                            hintText: "Write a caption...",
-                            border: InputBorder.none),
-                        maxLines: 8,
+                      child: const Text(
+                        "Post",
+                        style: TextStyle(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0),
                       ),
-                    ),
-                    SizedBox(
-                      height: 45.0,
-                      width: 45.0,
-                      child: AspectRatio(
-                        aspectRatio: 487 / 451,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                            fit: BoxFit.fill,
-                            alignment: FractionalOffset.topCenter,
-                            image: MemoryImage(_file!),
-                          )),
-                        ),
-                      ),
-                    ),
+                    )
                   ],
                 ),
-                const Divider(),
-              ],
-            ),
-          );
+                body: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            userProvider.getUser!.photoUrl,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          child: TextField(
+                            controller: _descriptionController,
+                            decoration: const InputDecoration(
+                                hintText: "Write a caption...",
+                                border: InputBorder.none),
+                            maxLines: 8,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 45.0,
+                          width: 45.0,
+                          child: AspectRatio(
+                            aspectRatio: 487 / 451,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                fit: BoxFit.fill,
+                                alignment: FractionalOffset.topCenter,
+                                image: MemoryImage(_file!),
+                              )),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                  ],
+                ),
+              );
   }
 }
