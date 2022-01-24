@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,33 +12,54 @@ class FirestoreMethods {
   final FirebaseFirestore _firesote = FirebaseFirestore.instance;
 
   Future<String> uploadPost(
-      String description,
-      Uint8List file,
-      String uid,
-      String username,
-      String profileImage,
-      ) async {
+    String description,
+    Uint8List file,
+    String uid,
+    String username,
+    String profileImage,
+  ) async {
     String res = "some erro occurred";
-    try{
-       String photoUrl = await StorageMethods().uploadImageToStorage('post', file, true);
-      
-       String postId = const Uuid().v1();
-       Post post = Post(
-         description: description,
-         uid: uid,
-         username: username,
-         postId: postId,
-         datePublished: DateTime.now(),
-         profImage: profileImage,
-         likes: [],
-         postUrl: photoUrl,
-       );
+    try {
+      String photoUrl =
+          await StorageMethods().uploadImageToStorage('post', file, true);
 
-       _firesote.collection('post').doc(postId).set(post.toJson(),);
-       res = "success";
+      String postId = const Uuid().v1();
+      Post post = Post(
+        description: description,
+        uid: uid,
+        username: username,
+        postId: postId,
+        datePublished: DateTime.now(),
+        profImage: profileImage,
+        likes: [],
+        postUrl: photoUrl,
+      );
+
+      _firesote.collection('post').doc(postId).set(
+            post.toJson(),
+          );
+      res = "success";
     } catch (err) {
       res = err.toString();
     }
     return res;
+  }
+
+  Future<void> likPost(String postId, String uid, List likes) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firesote.collection('post').doc(postId).update({
+          'likes': FieldValue.arrayRemove([uid]),
+        });
+      } else {
+        await _firesote.collection('post').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid]),
+        });
+      }
+    } catch (e) {
+      print(
+        e.toString(),
+      );
+    }
   }
 }
